@@ -1,0 +1,2719 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Alejandro Zenteno — Stellar (Spotify variant)</title>
+
+    <!-- ============================================================
+         TYPOGRAPHY — easy to swap.
+         Currently: Cormorant Garamond (display) + Crimson Pro (body)
+         + JetBrains Mono. To swap, replace the <link> below and update
+         the --font-display / --font-body variables in :root.
+         Alternatives (all free on Google Fonts):
+           1. Playfair Display + EB Garamond  (old star atlas)
+           2. DM Serif Display + Spectral     (refined modern)
+           3. Italiana + Lora                 (ethereal / fashion)
+         ============================================================ -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Crimson+Text:ital,wght@0,400;0,600;0,700;1,400;1,600&family=IM+Fell+English:ital@0;1&family=JetBrains+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      /* ============================================================
+         DESIGN TOKENS — astronomical journal palette
+         ============================================================ */
+      :root {
+        /* DAWN / day theme */
+        --shell: #f3ecde;
+        --paper: #f8f2e3;
+        --tile: #fdf8eb;
+        --tile-tint: #f4ecd8;
+        --hairline: rgba(34, 28, 20, 0.13);
+        --hairline-strong: rgba(34, 28, 20, 0.24);
+        --ink: #1c1812;
+        --muted-ink: #5a5246;
+        --soft-ink: #8a8175;
+        --accent: #823558; /* deep plum */
+        --accent-soft: #b76d92;
+        --accent-rgb: 130, 53, 88;
+        --sage: #4f6048;
+        --sage-rgb: 79, 96, 72;
+        --star-warm: 210, 170, 195;
+        --star-cool: 170, 200, 220;
+        --shadow-sm: 0 4px 14px -8px rgba(34, 28, 20, 0.18);
+        --shadow-md: 0 18px 48px -32px rgba(34, 28, 20, 0.42);
+        --shadow-lg: 0 28px 72px -40px rgba(34, 28, 20, 0.55);
+
+        --font-display: "IM Fell English", "Times New Roman", serif;
+        --font-body: "Crimson Text", Georgia, serif;
+        --font-mono: "JetBrains Mono", ui-monospace, monospace;
+
+        --radius-md: 16px;
+        --radius-lg: 22px;
+        --ease: cubic-bezier(0.22, 0.61, 0.36, 1);
+        --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+      }
+
+      :root.dark {
+        /* MIDNIGHT */
+        --shell: #0c0d14;
+        --paper: #11121a;
+        --tile: #15161f;
+        --tile-tint: #1c1d27;
+        --hairline: rgba(232, 220, 200, 0.1);
+        --hairline-strong: rgba(232, 220, 200, 0.2);
+        --ink: #ede4d2;
+        --muted-ink: #b9b1a1;
+        --soft-ink: #847c70;
+        --accent: #c890b0;
+        --accent-soft: #dba6c0;
+        --accent-rgb: 200, 144, 176;
+        --sage: #a3b09a;
+        --sage-rgb: 163, 176, 154;
+        --star-warm: 210, 170, 195;
+        --star-cool: 200, 215, 230;
+        --shadow-sm: 0 4px 14px -8px rgba(0, 0, 0, 0.55);
+        --shadow-md: 0 18px 48px -32px rgba(0, 0, 0, 0.7);
+        --shadow-lg: 0 28px 72px -40px rgba(0, 0, 0, 0.85);
+      }
+
+      /* ============================================================
+         RESET + BASE
+         ============================================================ */
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      html {
+        scroll-behavior: smooth;
+        background: var(--shell);
+        color: var(--ink);
+      }
+
+      body {
+        font-family: var(--font-body);
+        font-size: 17px;
+        line-height: 1.6;
+        font-weight: 400;
+        background: var(--shell);
+        color: var(--ink);
+        min-height: 100vh;
+        overflow-x: hidden;
+        font-feature-settings: "liga" 1, "kern" 1, "lnum" 1, "pnum" 1;
+        -webkit-font-smoothing: antialiased;
+        text-rendering: optimizeLegibility;
+        transition: background-color 800ms var(--ease), color 500ms var(--ease);
+      }
+
+      /* Dark sky gets a subtle gradient — deep at top, slightly warmer at horizon */
+      :root.dark body {
+        background:
+          radial-gradient(ellipse at 50% 110%, rgba(130, 53, 88, 0.07), transparent 50%),
+          linear-gradient(180deg, #07080e 0%, #0c0d14 60%, #11121a 100%);
+        background-attachment: fixed;
+      }
+
+      /* Light sky gets a soft "dawn" gradient */
+      :root:not(.dark) body {
+        background:
+          radial-gradient(ellipse at 50% -10%, rgba(200, 144, 176, 0.13), transparent 60%),
+          linear-gradient(180deg, #f3ecde 0%, #f3ecde 50%, #ede4cc 100%);
+        background-attachment: fixed;
+      }
+
+      h1,
+      h2,
+      h3,
+      h4 {
+        font-family: var(--font-display);
+        font-weight: 500;
+        letter-spacing: -0.005em;
+        color: var(--ink);
+      }
+
+      ::selection {
+        background: rgba(var(--accent-rgb), 0.3);
+        color: var(--ink);
+      }
+
+      a {
+        color: inherit;
+        text-decoration: none;
+      }
+
+      button {
+        font-family: inherit;
+        font-size: inherit;
+        border: none;
+        background: none;
+        cursor: pointer;
+        color: inherit;
+      }
+
+      input,
+      textarea {
+        font-family: inherit;
+        font-size: inherit;
+        color: inherit;
+      }
+
+      /* ============================================================
+         STARFIELD — full-screen canvas behind everything
+         ============================================================ */
+      .starfield {
+        position: fixed;
+        inset: 0;
+        z-index: 0;
+        pointer-events: none;
+      }
+
+      /* Subtle grain on top of the sky for paper-like texture */
+      .grain {
+        position: fixed;
+        inset: 0;
+        z-index: 1;
+        pointer-events: none;
+        background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='240' height='240'><filter id='n'><feTurbulence baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.55 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)' opacity='0.5'/></svg>");
+        mix-blend-mode: overlay;
+        opacity: 0.12;
+      }
+
+      :root.dark .grain {
+        opacity: 0.06;
+      }
+
+      /* ============================================================
+         CONSTELLATION NAVIGATOR — small interactive star map
+         tied to site sections (the "related" element)
+         ============================================================ */
+      .constellation {
+        position: fixed;
+        top: 1.5rem;
+        right: 1.5rem;
+        width: 240px;
+        height: 240px;
+        z-index: 30;
+        pointer-events: auto;
+        opacity: 0.55;
+        transition: opacity 400ms var(--ease);
+      }
+
+      .constellation:hover {
+        opacity: 1;
+      }
+
+      .constellation .clines line {
+        stroke: var(--ink);
+        stroke-width: 0.5;
+        opacity: 0.25;
+        stroke-dasharray: 3 3;
+      }
+
+      :root.dark .constellation .clines line {
+        stroke: rgba(232, 220, 200, 0.4);
+        opacity: 0.45;
+      }
+
+      .constellation .cstar circle {
+        fill: var(--ink);
+        opacity: 0.55;
+        transition: all 320ms var(--ease);
+        cursor: pointer;
+      }
+
+      :root.dark .constellation .cstar circle {
+        fill: rgba(255, 250, 240, 0.85);
+      }
+
+      .constellation .cstar:hover circle,
+      .constellation .cstar.active circle {
+        fill: var(--accent);
+        filter: drop-shadow(0 0 6px var(--accent));
+      }
+
+      .constellation .cstar.active circle {
+        animation: starPulse 2.4s var(--ease) infinite;
+      }
+
+      @keyframes starPulse {
+        0%,
+        100% {
+          filter: drop-shadow(0 0 4px var(--accent));
+        }
+        50% {
+          filter: drop-shadow(0 0 12px var(--accent));
+        }
+      }
+
+      .constellation .cstar text {
+        fill: var(--muted-ink);
+        font-family: var(--font-mono);
+        font-size: 7.5px;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        opacity: 0;
+        transition: opacity 280ms var(--ease);
+        pointer-events: none;
+      }
+
+      .constellation:hover .cstar text,
+      .constellation .cstar.active text {
+        opacity: 0.85;
+      }
+
+      .constellation .label {
+        font-family: var(--font-display);
+        font-style: italic;
+        font-size: 10px;
+        fill: var(--soft-ink);
+        letter-spacing: 0.06em;
+      }
+
+      @media (max-width: 880px) {
+        .constellation {
+          display: none;
+        }
+      }
+
+      /* ============================================================
+         APP SHELL
+         ============================================================ */
+      .app {
+        position: relative;
+        z-index: 2;
+        display: grid;
+        grid-template-columns: 240px 1fr;
+        min-height: 100vh;
+        max-width: 1480px;
+        margin: 0 auto;
+      }
+
+      .sidebar {
+        position: sticky;
+        top: 0;
+        height: 100vh;
+        padding: 2.5rem 1.5rem 1.5rem;
+        border-right: 1px solid var(--hairline);
+        display: flex;
+        flex-direction: column;
+        backdrop-filter: blur(2px);
+      }
+
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 0.7rem;
+        margin-bottom: 2.5rem;
+      }
+
+      .brand-mark {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        background: radial-gradient(circle at 30% 30%, var(--accent-soft), var(--accent) 70%);
+        box-shadow: 0 0 0 4px rgba(var(--accent-rgb), 0.12), var(--shadow-sm);
+        position: relative;
+        overflow: hidden;
+      }
+
+      .brand-mark::after {
+        content: "";
+        position: absolute;
+        inset: 6px;
+        border-radius: 50%;
+        background: radial-gradient(circle at 70% 70%, rgba(255, 255, 255, 0.3), transparent 50%);
+      }
+
+      .brand-name {
+        font-family: var(--font-display);
+        font-size: 1.35rem;
+        font-weight: 500;
+        font-style: italic;
+        letter-spacing: 0.005em;
+        line-height: 1.05;
+        white-space: nowrap;
+      }
+
+      .nav {
+        display: flex;
+        flex-direction: column;
+        gap: 0.15rem;
+        position: relative;
+      }
+
+      .nav-indicator {
+        position: absolute;
+        left: 0;
+        width: 100%;
+        height: 38px;
+        border-radius: 10px;
+        background: rgba(var(--accent-rgb), 0.1);
+        border: 1px solid rgba(var(--accent-rgb), 0.22);
+        z-index: 0;
+        transition: transform 380ms var(--ease-out), opacity 200ms ease;
+        pointer-events: none;
+      }
+
+      .nav-link {
+        position: relative;
+        z-index: 1;
+        display: flex;
+        align-items: center;
+        gap: 0.7rem;
+        padding: 0.55rem 0.9rem;
+        font-size: 1rem;
+        color: var(--muted-ink);
+        font-family: var(--font-display);
+        font-weight: 500;
+        letter-spacing: 0.005em;
+        border-radius: 10px;
+        height: 38px;
+        cursor: pointer;
+        transition: color 220ms var(--ease);
+      }
+
+      .nav-link:hover {
+        color: var(--ink);
+      }
+
+      .nav-link.active {
+        color: var(--accent);
+        font-style: italic;
+      }
+
+      .nav-link .num {
+        font-family: var(--font-mono);
+        font-size: 0.65rem;
+        opacity: 0.55;
+        font-weight: 400;
+        letter-spacing: 0.05em;
+      }
+
+      .sidebar-footer {
+        margin-top: auto;
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+      }
+
+      .clock {
+        font-family: var(--font-mono);
+        font-size: 0.7rem;
+        color: var(--soft-ink);
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      .clock-time {
+        font-size: 0.95rem;
+        color: var(--ink);
+        font-feature-settings: "tnum" 1;
+        letter-spacing: 0.04em;
+        text-transform: none;
+        margin-top: 2px;
+      }
+
+      .theme-toggle {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.45rem 0.75rem;
+        border-radius: 999px;
+        border: 1px solid var(--hairline-strong);
+        background: var(--tile);
+        font-family: var(--font-display);
+        font-size: 0.8rem;
+        font-style: italic;
+        color: var(--muted-ink);
+        align-self: flex-start;
+        transition: all 220ms var(--ease);
+      }
+
+      .theme-toggle:hover {
+        border-color: rgba(var(--accent-rgb), 0.4);
+        transform: translateY(-1px);
+        color: var(--ink);
+      }
+
+      .theme-toggle svg {
+        width: 14px;
+        height: 14px;
+      }
+
+      .main {
+        padding: 2.5rem 3rem 4rem;
+        min-height: 100vh;
+        position: relative;
+      }
+
+      .main-inner {
+        max-width: 1100px;
+        margin: 0 auto;
+      }
+
+      .section-stamp {
+        font-family: var(--font-mono);
+        font-size: 0.68rem;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: var(--soft-ink);
+        margin-bottom: 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+      }
+
+      .section-stamp::before {
+        content: "✦";
+        color: var(--accent);
+        font-size: 0.8rem;
+      }
+
+      .section {
+        display: none;
+        animation: sectionIn 700ms var(--ease-out);
+      }
+
+      .section.active {
+        display: block;
+      }
+
+      @keyframes sectionIn {
+        from {
+          opacity: 0;
+          transform: translateY(14px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      /* ============================================================
+         BENTO GRID
+         ============================================================ */
+      .bento {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        grid-auto-rows: minmax(150px, auto);
+        gap: 18px;
+      }
+
+      .tile {
+        background: color-mix(in oklab, var(--tile), transparent 8%);
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        border: 1px solid var(--hairline);
+        border-radius: var(--radius-md);
+        padding: 1.4rem;
+        position: relative;
+        overflow: hidden;
+        transition: transform 380ms var(--ease-out), border-color 220ms,
+          box-shadow 380ms var(--ease-out);
+        animation: tileIn 700ms var(--ease-out) both;
+      }
+
+      .tile:hover {
+        transform: translateY(-3px);
+        border-color: var(--hairline-strong);
+        box-shadow: var(--shadow-md);
+      }
+
+      @keyframes tileIn {
+        from {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .tile:nth-child(1) { animation-delay: 50ms; }
+      .tile:nth-child(2) { animation-delay: 130ms; }
+      .tile:nth-child(3) { animation-delay: 210ms; }
+      .tile:nth-child(4) { animation-delay: 290ms; }
+      .tile:nth-child(5) { animation-delay: 370ms; }
+      .tile:nth-child(6) { animation-delay: 450ms; }
+      .tile:nth-child(7) { animation-delay: 530ms; }
+      .tile:nth-child(8) { animation-delay: 610ms; }
+      .tile:nth-child(9) { animation-delay: 690ms; }
+
+      .tile.span-2 { grid-column: span 2; }
+      .tile.span-3 { grid-column: span 3; }
+      .tile.span-4 { grid-column: span 4; }
+      .tile.row-2 { grid-row: span 2; }
+
+      /* INTRO TILE — astrological frame */
+      .intro-tile {
+        background:
+          radial-gradient(circle at 85% 15%, rgba(var(--accent-rgb), 0.1), transparent 50%),
+          radial-gradient(circle at 15% 95%, rgba(var(--sage-rgb), 0.07), transparent 55%),
+          color-mix(in oklab, var(--tile), transparent 8%);
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        gap: 1.2rem;
+      }
+
+      .intro-top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+
+      .avatar {
+        width: 54px;
+        height: 54px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, var(--accent), var(--sage));
+        position: relative;
+        overflow: hidden;
+        box-shadow: var(--shadow-sm), 0 0 0 3px rgba(var(--accent-rgb), 0.1);
+      }
+
+      .avatar::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background:
+          radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.4), transparent 50%),
+          radial-gradient(circle at 70% 80%, rgba(0, 0, 0, 0.2), transparent 50%);
+      }
+
+      .avatar::after {
+        content: attr(data-initial);
+        position: absolute;
+        inset: 0;
+        display: grid;
+        place-items: center;
+        font-family: var(--font-display);
+        font-size: 1.5rem;
+        font-style: italic;
+        color: white;
+        font-weight: 500;
+        text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+      }
+
+      .status {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.45rem;
+        padding: 0.3rem 0.75rem;
+        border: 1px solid var(--hairline);
+        border-radius: 999px;
+        font-family: var(--font-mono);
+        font-size: 0.68rem;
+        color: var(--muted-ink);
+        letter-spacing: 0.05em;
+      }
+
+      .status-dot {
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: #4ade80;
+        box-shadow: 0 0 0 0 rgba(74, 222, 128, 0.6);
+        animation: pulse 2.4s var(--ease) infinite;
+      }
+
+      @keyframes pulse {
+        0%, 100% { box-shadow: 0 0 0 0 rgba(74, 222, 128, 0.5); }
+        50% { box-shadow: 0 0 0 6px rgba(74, 222, 128, 0); }
+      }
+
+      .intro-heading {
+        font-size: clamp(1.7rem, 2.6vw, 2.3rem);
+        line-height: 1.1;
+        font-weight: 500;
+        letter-spacing: -0.012em;
+      }
+
+      .intro-heading .name {
+        font-style: italic;
+        background: linear-gradient(92deg, var(--accent) 0%, var(--accent-soft) 100%);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+      }
+
+      .typed-cursor {
+        display: inline-block;
+        width: 2px;
+        height: 0.95em;
+        background: var(--accent);
+        margin-left: 2px;
+        vertical-align: -0.05em;
+        animation: blink 1s steps(2) infinite;
+      }
+
+      @keyframes blink {
+        50% { opacity: 0; }
+      }
+
+      .intro-bio {
+        color: var(--muted-ink);
+        font-size: 1rem;
+        line-height: 1.6;
+        max-width: 36rem;
+      }
+
+      .intro-bio em {
+        color: var(--accent);
+        font-style: italic;
+        font-family: var(--font-display);
+      }
+
+      .intro-bottom {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        flex-wrap: wrap;
+      }
+
+      .tags {
+        display: flex;
+        gap: 0.4rem;
+        flex-wrap: wrap;
+      }
+
+      .tag {
+        font-family: var(--font-mono);
+        font-size: 0.68rem;
+        padding: 0.28rem 0.6rem;
+        border: 1px solid var(--hairline);
+        border-radius: 6px;
+        background: rgba(var(--accent-rgb), 0.04);
+        color: var(--muted-ink);
+        letter-spacing: 0.04em;
+      }
+
+      .location {
+        font-family: var(--font-mono);
+        font-size: 0.7rem;
+        color: var(--soft-ink);
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        letter-spacing: 0.05em;
+      }
+
+      /* PHOTO CAROUSEL */
+      .photo-tile {
+        padding: 0;
+        position: relative;
+        cursor: pointer;
+        min-height: 320px;
+      }
+
+      .photo-frame {
+        position: absolute;
+        inset: 0;
+        opacity: 0;
+        transition: opacity 1.4s var(--ease);
+      }
+
+      .photo-frame > svg {
+        width: 100%;
+        height: 100%;
+        display: block;
+      }
+
+      .photo-frame.active {
+        opacity: 1;
+      }
+
+      .photo-overlay {
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(180deg, transparent 50%, rgba(0, 0, 0, 0.55) 100%);
+        z-index: 1;
+      }
+
+      .photo-info {
+        position: absolute;
+        bottom: 1rem;
+        left: 1.25rem;
+        right: 1.25rem;
+        color: white;
+        display: flex;
+        align-items: end;
+        justify-content: space-between;
+        z-index: 2;
+      }
+
+      .photo-location {
+        font-family: var(--font-display);
+        font-style: italic;
+        font-size: 1.2rem;
+        font-weight: 500;
+      }
+
+      .photo-dots {
+        display: flex;
+        gap: 5px;
+      }
+
+      .photo-dot {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.4);
+        transition: all 220ms var(--ease);
+      }
+
+      .photo-dot.active {
+        background: white;
+        width: 18px;
+        border-radius: 3px;
+      }
+
+      /* NOW PLAYING */
+      .np-header {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-bottom: 1rem;
+        font-family: var(--font-mono);
+        font-size: 0.68rem;
+        text-transform: uppercase;
+        letter-spacing: 0.16em;
+        color: var(--soft-ink);
+      }
+
+      .np-icon {
+        width: 14px;
+        height: 14px;
+        border-radius: 50%;
+        background: #1db954;
+      }
+
+      .np-track {
+        display: flex;
+        align-items: center;
+        gap: 0.85rem;
+      }
+
+      .np-cover {
+        width: 56px;
+        height: 56px;
+        border-radius: 8px;
+        background: linear-gradient(135deg, #3a0d2a, #d04574);
+        flex-shrink: 0;
+        box-shadow: var(--shadow-sm);
+        position: relative;
+        overflow: hidden;
+        transition: background 800ms var(--ease);
+      }
+
+      .np-cover::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.25), transparent 60%);
+      }
+
+      /* ============================================================
+         MUSIC TILE — Spotify playlist embed
+         ============================================================ */
+      .music-tile {
+        padding: 0;
+        overflow: hidden;
+        line-height: 0; /* removes any baseline gap below inline iframe */
+      }
+      .music-frame {
+        display: block;
+        width: 100%;
+        height: 152px;
+        border-radius: var(--radius-md);
+        border: none;
+        background: rgba(0, 0, 0, 0.2);
+      }
+
+      .np-info {
+        flex: 1;
+        min-width: 0;
+      }
+
+      .np-title {
+        font-family: var(--font-display);
+        font-size: 1.05rem;
+        font-weight: 500;
+        color: var(--ink);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .np-artist {
+        font-size: 0.85rem;
+        color: var(--muted-ink);
+        font-style: italic;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .equalizer {
+        display: flex;
+        align-items: end;
+        gap: 2px;
+        height: 16px;
+      }
+
+      .eq-bar {
+        width: 3px;
+        background: var(--accent);
+        border-radius: 1px;
+        animation: eq 1s ease-in-out infinite;
+      }
+
+      .eq-bar:nth-child(1) { animation-delay: 0s; }
+      .eq-bar:nth-child(2) { animation-delay: 0.15s; }
+      .eq-bar:nth-child(3) { animation-delay: 0.3s; }
+      .eq-bar:nth-child(4) { animation-delay: 0.45s; }
+
+      @keyframes eq {
+        0%, 100% { height: 4px; }
+        50% { height: 16px; }
+      }
+
+      /* STATS */
+      .stats-tile {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0;
+      }
+
+      .stat {
+        padding: 0.5rem 0;
+        border-right: 1px solid var(--hairline);
+      }
+
+      .stat:nth-child(2n) {
+        border-right: none;
+        padding-left: 1rem;
+      }
+
+      .stat:nth-child(-n + 2) {
+        border-bottom: 1px solid var(--hairline);
+        padding-bottom: 1rem;
+        margin-bottom: 0.6rem;
+      }
+
+      .stat-num {
+        font-family: var(--font-display);
+        font-size: 2rem;
+        font-weight: 500;
+        color: var(--ink);
+        font-feature-settings: "tnum" 1;
+        letter-spacing: -0.02em;
+      }
+
+      .stat-label {
+        font-family: var(--font-mono);
+        font-size: 0.62rem;
+        text-transform: uppercase;
+        letter-spacing: 0.14em;
+        color: var(--soft-ink);
+        margin-top: 0.15rem;
+      }
+
+      /* LINKS */
+      .link-tile {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        cursor: pointer;
+        gap: 0.7rem;
+      }
+
+      .link-tile .lt-icon {
+        width: 36px;
+        height: 36px;
+        display: grid;
+        place-items: center;
+        border-radius: 10px;
+        background: rgba(var(--accent-rgb), 0.06);
+        border: 1px solid var(--hairline);
+        color: var(--ink);
+        transition: all 280ms var(--ease);
+      }
+
+      .link-tile:hover .lt-icon {
+        background: rgba(var(--accent-rgb), 0.14);
+        border-color: rgba(var(--accent-rgb), 0.32);
+        transform: rotate(-3deg) scale(1.05);
+      }
+
+      .link-tile .lt-icon svg {
+        width: 18px;
+        height: 18px;
+      }
+
+      .lt-label {
+        font-family: var(--font-display);
+        font-size: 1.1rem;
+        font-weight: 500;
+        color: var(--ink);
+      }
+
+      .lt-handle {
+        font-family: var(--font-mono);
+        font-size: 0.7rem;
+        color: var(--soft-ink);
+        letter-spacing: 0.04em;
+      }
+
+      .lt-arrow {
+        position: absolute;
+        top: 1.2rem;
+        right: 1.2rem;
+        font-size: 1rem;
+        color: var(--soft-ink);
+        transition: all 280ms var(--ease);
+      }
+
+      .link-tile:hover .lt-arrow {
+        color: var(--accent);
+        transform: translate(2px, -2px);
+      }
+
+      /* QUOTE */
+      .quote-tile {
+        display: flex;
+        align-items: center;
+        background:
+          radial-gradient(circle at 20% 30%, rgba(var(--accent-rgb), 0.08), transparent 60%),
+          color-mix(in oklab, var(--tile), transparent 8%);
+      }
+
+      .quote {
+        font-family: var(--font-display);
+        font-style: italic;
+        font-size: 1.2rem;
+        line-height: 1.4;
+        color: var(--muted-ink);
+        font-weight: 400;
+      }
+
+      .quote::before {
+        content: "“";
+        font-size: 2.8rem;
+        line-height: 0;
+        vertical-align: -0.3em;
+        color: var(--accent);
+        margin-right: 0.2rem;
+      }
+
+      /* ============================================================
+         ABOUT
+         ============================================================ */
+      .article {
+        max-width: 38rem;
+        margin: 0 auto;
+      }
+
+      .article h1 {
+        font-size: clamp(2.4rem, 4vw, 3.2rem);
+        font-weight: 500;
+        margin-bottom: 0.5rem;
+        letter-spacing: -0.018em;
+      }
+
+      .article .subhead {
+        color: var(--muted-ink);
+        font-size: 1.05rem;
+        margin-bottom: 2rem;
+        font-style: italic;
+        font-family: var(--font-display);
+      }
+
+      .article p {
+        margin-bottom: 1.1rem;
+        line-height: 1.78;
+      }
+
+      .article p:first-of-type::first-letter {
+        float: left;
+        font-family: var(--font-display);
+        font-size: clamp(3.4rem, 6.5vw, 4.4rem);
+        line-height: 0.85;
+        margin: 0.05em 0.18em 0 0;
+        padding: 0.14em 0.18em 0.05em;
+        font-weight: 500;
+        font-style: italic;
+        color: var(--accent);
+        background: linear-gradient(180deg, rgba(var(--accent-rgb), 0.12), rgba(var(--accent-rgb), 0.04));
+        border-radius: 8px;
+      }
+
+      .divider {
+        height: 1px;
+        margin: 2.2rem 0;
+        background: linear-gradient(
+          90deg,
+          transparent,
+          rgba(var(--accent-rgb), 0.3),
+          rgba(var(--sage-rgb), 0.3),
+          transparent
+        );
+      }
+
+      .article h2 {
+        font-size: 1.6rem;
+        margin-bottom: 1rem;
+        font-weight: 500;
+        font-style: italic;
+      }
+
+      .article ul {
+        list-style: none;
+        padding-left: 0;
+      }
+
+      .article ul li {
+        padding-left: 1.4rem;
+        position: relative;
+        margin-bottom: 0.55rem;
+      }
+
+      .article ul li::before {
+        content: "✦";
+        position: absolute;
+        left: 0;
+        color: var(--accent);
+        font-size: 0.75rem;
+      }
+
+      /* ============================================================
+         PROJECTS
+         ============================================================ */
+      .page-head {
+        margin-bottom: 1.8rem;
+      }
+
+      .page-head h1 {
+        font-size: clamp(2.2rem, 3.6vw, 2.8rem);
+        font-weight: 500;
+        margin-bottom: 0.4rem;
+        letter-spacing: -0.012em;
+      }
+
+      .page-head p {
+        color: var(--muted-ink);
+        font-style: italic;
+        font-family: var(--font-display);
+        font-size: 1.05rem;
+      }
+
+      .filters {
+        display: flex;
+        gap: 0.5rem;
+        margin-bottom: 1.5rem;
+        flex-wrap: wrap;
+      }
+
+      .filter-pill {
+        padding: 0.4rem 1rem;
+        border: 1px solid var(--hairline-strong);
+        border-radius: 999px;
+        background: color-mix(in oklab, var(--tile), transparent 5%);
+        font-family: var(--font-display);
+        font-size: 0.92rem;
+        color: var(--muted-ink);
+        transition: all 220ms var(--ease);
+      }
+
+      .filter-pill:hover {
+        color: var(--ink);
+        border-color: rgba(var(--accent-rgb), 0.4);
+      }
+
+      .filter-pill.active {
+        background: rgba(var(--accent-rgb), 0.14);
+        border-color: rgba(var(--accent-rgb), 0.4);
+        color: var(--accent);
+        font-style: italic;
+      }
+
+      .projects-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 1rem;
+      }
+
+      .project-card {
+        background: color-mix(in oklab, var(--card-bg, var(--tile)), transparent 10%);
+        backdrop-filter: blur(8px);
+        border: 1px solid var(--card-border, var(--hairline));
+        border-radius: var(--radius-md);
+        padding: 1.4rem;
+        position: relative;
+        cursor: pointer;
+        transition: transform 380ms var(--ease-out), box-shadow 380ms var(--ease-out);
+        animation: tileIn 500ms var(--ease-out) both;
+      }
+
+      .project-card:hover {
+        transform: translateY(-3px);
+        box-shadow: var(--shadow-md);
+      }
+
+      :root.dark .project-card {
+        background: color-mix(in oklab, var(--tile), transparent 8%);
+        border-color: var(--hairline);
+      }
+
+      .project-dot {
+        position: absolute;
+        top: 1.2rem;
+        right: 1.2rem;
+        width: 9px;
+        height: 9px;
+        border-radius: 50%;
+        background: var(--card-color, var(--accent));
+        box-shadow: 0 0 0 3px color-mix(in oklab, var(--card-color), transparent 80%),
+          0 0 12px color-mix(in oklab, var(--card-color), transparent 50%);
+      }
+
+      .project-name {
+        font-family: var(--font-display);
+        font-size: 1.25rem;
+        font-weight: 500;
+        margin-bottom: 0.35rem;
+        padding-right: 1.5rem;
+        letter-spacing: -0.01em;
+      }
+
+      .project-cats {
+        display: flex;
+        gap: 0.3rem;
+        margin-bottom: 0.7rem;
+      }
+
+      .project-cat {
+        font-family: var(--font-mono);
+        font-size: 0.6rem;
+        text-transform: uppercase;
+        letter-spacing: 0.12em;
+        padding: 0.18rem 0.5rem;
+        border: 1px solid var(--hairline-strong);
+        border-radius: 4px;
+        color: var(--soft-ink);
+      }
+
+      .project-desc {
+        font-size: 0.95rem;
+        color: var(--muted-ink);
+        line-height: 1.55;
+        margin-bottom: 1rem;
+      }
+
+      .stack {
+        display: flex;
+        gap: 0.3rem;
+        flex-wrap: wrap;
+      }
+
+      .stack-item {
+        font-family: var(--font-mono);
+        font-size: 0.64rem;
+        padding: 0.2rem 0.5rem;
+        background: rgba(var(--accent-rgb), 0.04);
+        border: 1px solid var(--hairline);
+        border-radius: 4px;
+        color: var(--soft-ink);
+        letter-spacing: 0.04em;
+      }
+
+      /* ============================================================
+         NOTES
+         ============================================================ */
+      .notes {
+        max-width: 48rem;
+        margin: 0 auto;
+      }
+
+      .year-header {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        margin: 2rem 0 1rem;
+      }
+
+      .year-line {
+        height: 1px;
+        flex: 1;
+        background: var(--hairline-strong);
+      }
+
+      .year-text {
+        font-family: var(--font-display);
+        font-size: 1.05rem;
+        font-style: italic;
+        color: var(--muted-ink);
+        letter-spacing: 0.04em;
+      }
+
+      .note-item {
+        display: block;
+        padding: 0.85rem 0.9rem;
+        border-radius: 10px;
+        margin-bottom: 0.4rem;
+        cursor: pointer;
+        transition: all 220ms var(--ease);
+      }
+
+      .note-item:hover {
+        background: rgba(var(--accent-rgb), 0.06);
+      }
+
+      .note-title {
+        font-family: var(--font-display);
+        font-size: 1.15rem;
+        font-weight: 500;
+        color: var(--ink);
+        margin-bottom: 0.15rem;
+        transition: color 200ms;
+      }
+
+      .note-item:hover .note-title {
+        color: var(--accent);
+        font-style: italic;
+      }
+
+      .note-desc {
+        font-size: 0.95rem;
+        color: var(--muted-ink);
+        line-height: 1.5;
+        margin-bottom: 0.3rem;
+      }
+
+      .note-date {
+        font-family: var(--font-mono);
+        font-size: 0.68rem;
+        color: var(--soft-ink);
+        letter-spacing: 0.06em;
+      }
+
+      /* Experience entries with bullets + meta */
+      .exp-item {
+        padding: 1rem 0.9rem 1.1rem;
+        border-radius: 10px;
+        margin-bottom: 0.4rem;
+        transition: all 220ms var(--ease);
+      }
+      .exp-item:hover {
+        background: rgba(var(--accent-rgb), 0.05);
+      }
+      .exp-head {
+        display: flex;
+        align-items: baseline;
+        gap: 0.7rem;
+        flex-wrap: wrap;
+        margin-bottom: 0.1rem;
+      }
+      .exp-head .exp-date {
+        margin-left: auto;
+      }
+      .exp-subhead {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 1rem;
+        flex-wrap: wrap;
+        margin-bottom: 0.55rem;
+      }
+      .exp-title {
+        font-family: var(--font-display);
+        font-size: 1.2rem;
+        font-weight: 600;
+        color: var(--ink);
+      }
+      .exp-item:hover .exp-title {
+        color: var(--accent);
+        font-style: italic;
+      }
+      .exp-kind {
+        font-family: var(--font-mono);
+        font-size: 0.6rem;
+        text-transform: uppercase;
+        letter-spacing: 0.14em;
+        color: var(--accent);
+        padding: 0.18rem 0.5rem;
+        border: 1px solid rgba(var(--accent-rgb), 0.35);
+        border-radius: 4px;
+      }
+      .exp-date {
+        font-family: var(--font-mono);
+        font-size: 0.7rem;
+        color: var(--soft-ink);
+        letter-spacing: 0.05em;
+        white-space: nowrap;
+      }
+      .exp-role {
+        font-family: var(--font-display);
+        font-style: italic;
+        font-size: 1rem;
+        color: var(--muted-ink);
+      }
+      .exp-loc {
+        font-family: var(--font-mono);
+        font-style: normal;
+        font-size: 0.72rem;
+        color: var(--soft-ink);
+        letter-spacing: 0.04em;
+        white-space: nowrap;
+      }
+      .exp-bullets {
+        list-style: none;
+        padding-left: 0;
+        margin: 0;
+      }
+      .exp-bullets li {
+        position: relative;
+        padding-left: 1.2rem;
+        font-size: 0.95rem;
+        color: var(--muted-ink);
+        line-height: 1.55;
+        margin-bottom: 0.35rem;
+      }
+      .exp-bullets li::before {
+        content: "✦";
+        position: absolute;
+        left: 0;
+        top: 0.05em;
+        color: var(--accent);
+        font-size: 0.7rem;
+        opacity: 0.7;
+      }
+      .exp-bullets li:last-child {
+        margin-bottom: 0;
+      }
+
+      /* ============================================================
+         CONTACT
+         ============================================================ */
+      .contact-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+        max-width: 32rem;
+        margin: 0 auto;
+      }
+
+      @media (max-width: 800px) {
+        .contact-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      .contact-card {
+        background: color-mix(in oklab, var(--tile), transparent 8%);
+        backdrop-filter: blur(8px);
+        border: 1px solid var(--hairline);
+        border-radius: var(--radius-md);
+        padding: 1.8rem;
+      }
+
+      .contact-card h2 {
+        font-family: var(--font-display);
+        font-size: 1.6rem;
+        margin-bottom: 1.4rem;
+        font-style: italic;
+      }
+
+      .contact-card p {
+        color: var(--muted-ink);
+        font-size: 0.97rem;
+        margin-bottom: 1.4rem;
+        line-height: 1.6;
+      }
+
+      .form-field {
+        margin-bottom: 0.9rem;
+      }
+
+      .form-field label {
+        display: block;
+        font-family: var(--font-mono);
+        font-size: 0.66rem;
+        text-transform: uppercase;
+        letter-spacing: 0.14em;
+        color: var(--soft-ink);
+        margin-bottom: 0.35rem;
+      }
+
+      .form-input,
+      .form-textarea {
+        width: 100%;
+        padding: 0.7rem 0.85rem;
+        background: rgba(var(--accent-rgb), 0.04);
+        border: 1px solid var(--hairline);
+        border-radius: 8px;
+        font-family: var(--font-body);
+        font-size: 0.97rem;
+        color: var(--ink);
+        transition: border-color 200ms;
+        resize: vertical;
+      }
+
+      .form-input:focus,
+      .form-textarea:focus {
+        outline: none;
+        border-color: rgba(var(--accent-rgb), 0.5);
+        background: var(--tile);
+      }
+
+      .form-btn {
+        padding: 0.7rem 1.5rem;
+        background: var(--accent);
+        color: white;
+        border-radius: 8px;
+        font-family: var(--font-display);
+        font-size: 1rem;
+        font-weight: 500;
+        font-style: italic;
+        transition: all 220ms var(--ease);
+      }
+
+      .form-btn:hover {
+        background: color-mix(in oklab, var(--accent), white 8%);
+        transform: translateY(-1px);
+        box-shadow: var(--shadow-sm);
+      }
+
+      .form-btn:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+      }
+
+      .toast {
+        position: fixed;
+        bottom: 2rem;
+        right: 2rem;
+        padding: 1rem 1.4rem;
+        background: var(--tile);
+        border: 1px solid rgba(var(--accent-rgb), 0.4);
+        border-radius: 12px;
+        box-shadow: var(--shadow-lg);
+        font-family: var(--font-display);
+        font-size: 1rem;
+        font-style: italic;
+        color: var(--ink);
+        z-index: 100;
+        transform: translateY(120%);
+        opacity: 0;
+        transition: all 380ms var(--ease-out);
+      }
+
+      .toast.show {
+        transform: translateY(0);
+        opacity: 1;
+      }
+
+      .contact-info {
+        background: color-mix(in oklab, var(--tile), transparent 8%);
+        backdrop-filter: blur(8px);
+        border: 1px solid var(--hairline);
+        border-radius: var(--radius-md);
+        padding: 1.8rem;
+      }
+
+      .contact-row {
+        padding: 0.85rem 0;
+        border-bottom: 1px solid var(--hairline);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 1rem;
+      }
+
+      .contact-row:last-child {
+        border-bottom: none;
+      }
+
+      .contact-row .label {
+        font-family: var(--font-mono);
+        font-size: 0.68rem;
+        text-transform: uppercase;
+        letter-spacing: 0.14em;
+        color: var(--soft-ink);
+      }
+
+      .contact-row .value {
+        font-family: var(--font-display);
+        font-size: 1.02rem;
+        color: var(--ink);
+      }
+
+      .contact-row a:hover .value {
+        color: var(--accent);
+        font-style: italic;
+      }
+
+      /* ============================================================
+         MOBILE
+         ============================================================ */
+      .mobile-nav {
+        display: none;
+      }
+
+      @media (max-width: 880px) {
+        .app {
+          grid-template-columns: 1fr;
+        }
+        .sidebar {
+          display: none;
+        }
+        .mobile-nav .brand-name {
+          font-size: 1.1rem;
+          line-height: 1.2;
+        }
+        .mobile-nav {
+          display: flex;
+          position: sticky;
+          top: 0;
+          z-index: 50;
+          background: color-mix(in oklab, var(--shell), transparent 8%);
+          backdrop-filter: blur(12px);
+          -webkit-backdrop-filter: blur(12px);
+          border-bottom: 1px solid var(--hairline);
+          padding: 0.75rem 1rem;
+          align-items: center;
+          justify-content: space-between;
+          gap: 1rem;
+        }
+        .mobile-nav-links {
+          display: flex;
+          gap: 0.4rem;
+          overflow-x: auto;
+          flex: 1;
+          scrollbar-width: none;
+        }
+        .mobile-nav-links::-webkit-scrollbar {
+          display: none;
+        }
+        .mobile-nav-links .nav-link {
+          padding: 0.4rem 0.8rem;
+          height: auto;
+          flex-shrink: 0;
+          font-size: 0.95rem;
+        }
+        .mobile-nav-links .nav-link.active {
+          background: rgba(var(--accent-rgb), 0.12);
+          border-radius: 8px;
+        }
+        .main {
+          padding: 1.5rem 1.2rem 3rem;
+        }
+        .bento {
+          grid-template-columns: repeat(2, 1fr);
+        }
+        .tile.span-3,
+        .tile.span-4 {
+          grid-column: span 2;
+        }
+      }
+
+      @media (max-width: 480px) {
+        .bento {
+          grid-template-columns: 1fr;
+        }
+        .tile.span-2,
+        .tile.span-3,
+        .tile.span-4 {
+          grid-column: span 1;
+        }
+        .stats-tile {
+          grid-template-columns: 1fr 1fr;
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        *,
+        *::before,
+        *::after {
+          animation-duration: 0.01ms !important;
+          transition-duration: 0.01ms !important;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <!-- ============== STARFIELD CANVAS ============== -->
+    <canvas class="starfield" id="starfield"></canvas>
+    <div class="grain"></div>
+
+    <!-- ============== CONSTELLATION NAVIGATOR ============== -->
+    <svg class="constellation" viewBox="0 0 240 240" id="constellation">
+      <!-- The lines are drawn first, behind the stars -->
+      <g class="clines">
+        <line x1="40" y1="50" x2="100" y2="30" />
+        <line x1="100" y1="30" x2="160" y2="80" />
+        <line x1="40" y1="50" x2="80" y2="130" />
+        <line x1="80" y1="130" x2="160" y2="80" />
+        <line x1="80" y1="130" x2="120" y2="200" />
+      </g>
+
+      <text class="label" x="6" y="18" style="font-style: italic">Site Map</text>
+
+      <!-- Section stars: Home / About / Projects / Notes / Contact -->
+      <g class="cstar active" data-section="home">
+        <circle cx="40" cy="50" r="3.5" />
+        <text x="46" y="54">Home</text>
+      </g>
+      <g class="cstar" data-section="about">
+        <circle cx="100" cy="30" r="2.6" />
+        <text x="106" y="34">About</text>
+      </g>
+      <g class="cstar" data-section="projects">
+        <circle cx="160" cy="80" r="3" />
+        <text x="166" y="84">Projects</text>
+      </g>
+      <g class="cstar" data-section="experience">
+        <circle cx="80" cy="130" r="2.4" />
+        <text x="86" y="134">Experience</text>
+      </g>
+      <g class="cstar" data-section="contact">
+        <circle cx="120" cy="200" r="2.8" />
+        <text x="126" y="204">Contact</text>
+      </g>
+    </svg>
+
+    <div class="app">
+      <!-- ============== SIDEBAR ============== -->
+      <aside class="sidebar">
+        <div class="brand">
+          <div class="brand-name">Alejandro Zenteno</div>
+        </div>
+
+        <nav class="nav" id="desktopNav">
+          <div class="nav-indicator" id="navIndicator"></div>
+          <a class="nav-link active" data-section="home">Home</a>
+          <a class="nav-link" data-section="about">About</a>
+          <a class="nav-link" data-section="projects">Projects</a>
+          <a class="nav-link" data-section="experience">Experience</a>
+          <a class="nav-link" data-section="contact">Contact</a>
+        </nav>
+
+        <div class="sidebar-footer">
+          <div class="clock">
+            <div>Tempe, AZ</div>
+            <div class="clock-time" id="clock">--:--:--</div>
+          </div>
+          <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" id="themeIcon">
+              <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" fill="currentColor"></path>
+            </svg>
+          </button>
+        </div>
+      </aside>
+
+      <!-- ============== MAIN ============== -->
+      <main class="main">
+        <div class="mobile-nav">
+          <div class="brand">
+            <div class="brand-name">Alejandro Zenteno</div>
+          </div>
+          <button class="theme-toggle" id="themeToggleMobile" aria-label="Toggle theme">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14">
+              <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" fill="currentColor"></path>
+            </svg>
+          </button>
+        </div>
+        <div class="mobile-nav" style="border-top: none">
+          <div class="mobile-nav-links" id="mobileNavLinks">
+            <a class="nav-link active" data-section="home">Home</a>
+            <a class="nav-link" data-section="about">About</a>
+            <a class="nav-link" data-section="projects">Projects</a>
+            <a class="nav-link" data-section="experience">Experience</a>
+            <a class="nav-link" data-section="contact">Contact</a>
+          </div>
+        </div>
+
+        <div class="main-inner">
+          <!-- ===== HOME ===== -->
+          <section class="section active" id="section-home">
+            <div class="section-stamp"><span id="dateStamp">Today</span></div>
+
+            <div class="bento">
+              <div class="tile intro-tile span-4 row-2">
+                <div>
+                  <h1 class="intro-heading" style="margin-bottom: 1.4rem;">
+                    Hi, I'm <span class="name" id="typedName">Alejandro</span><span class="typed-cursor"></span>.
+                  </h1>
+                  <p class="intro-bio">
+                    Finance, Business Data Analytics, and Supply Chain Management student at Arizona State University, focused on using <em>data-driven insights</em> to connect financial strategy, operations, and business analytics.
+                  </p>
+                </div>
+                <div class="intro-bottom">
+                  <div class="tags">
+                    <span class="tag">Python</span>
+                    <span class="tag">SQL</span>
+                    <span class="tag">Excel</span>
+                    <span class="tag">Tableau</span>
+                    <span class="tag">Financial Modeling</span>
+                    <span class="tag">Supply Chain Analytics</span>
+                    <span class="tag">Logistics &amp; Operations</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="tile music-tile span-4">
+                <iframe class="music-frame"
+                  src="https://open.spotify.com/embed/playlist/25sXqXsMxmu1k9gHc4faqj?utm_source=generator&theme=0"
+                  height="152" width="100%"
+                  frameborder="0" allowfullscreen=""
+                  allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+                  loading="lazy">
+                </iframe>
+              </div>
+
+              <a class="tile link-tile span-2" href="https://github.com/alozc" target="_blank" rel="noreferrer">
+                <div class="lt-icon">
+                  <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+                </div>
+                <span class="lt-arrow">↗</span>
+                <div>
+                  <div class="lt-label">GitHub</div>
+                  <div class="lt-handle">@alozc</div>
+                </div>
+              </a>
+
+              <a class="tile link-tile span-2" href="https://www.linkedin.com/in/alozc" target="_blank" rel="noreferrer">
+                <div class="lt-icon">
+                  <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+                </div>
+                <span class="lt-arrow">↗</span>
+                <div>
+                  <div class="lt-label">LinkedIn</div>
+                  <div class="lt-handle">@alozc</div>
+                </div>
+              </a>
+
+            </div>
+          </section>
+
+          <!-- ===== ABOUT ===== -->
+          <section class="section" id="section-about">
+            <div class="section-stamp"><span>About</span></div>
+            <div class="article">
+              <h1>About</h1>
+              <p>
+                I am a senior at Arizona State University studying Finance, Business Data Analytics, and Supply Chain Management. These disciplines may seem different, but to me they are connected by one main question: how does a company create value, and where can it improve?
+              </p>
+              <p>
+                My goal is to look at business problems from different perspectives and find ways to make companies more efficient, profitable, and prepared for growth. I am interested in understanding not only the numbers, but also the operations and decisions behind those numbers.
+              </p>
+              <p>
+                I enjoy work that connects financial analysis, operational improvement, and data-driven insights. For example, a logistics inefficiency can become a margin problem, and a financial metric may only make sense when the operational reality behind it is understood. That connection is what interests me most.
+              </p>
+              <p>
+                I am especially interested in work where I can analyze a company, understand how it operates, and use data to identify opportunities for improvement and investment into new markets for expansion. I also want to continue learning about business growth, emerging markets, and how capital can be used to create meaningful and long-term value.
+              </p>
+
+              <div class="divider"></div>
+
+              <h2>Currently exploring</h2>
+              <ul>
+                <li>How operational improvements — not just financial leverage — drive real returns</li>
+                <li>Supply chain analytics: spotting inefficiencies that compound into margin</li>
+                <li>How capital moves through different asset classes and emerging markets</li>
+                <li>Financial modeling and valuation under different scenarios and structures</li>
+                <li>The intersection of data analytics, finance, and operations strategy</li>
+              </ul>
+            </div>
+          </section>
+
+          <!-- ===== PROJECTS ===== -->
+          <section class="section" id="section-projects">
+            <div class="section-stamp"><span>Selected work</span></div>
+            <div class="page-head">
+              <h1>Projects</h1>
+              <p>A collection of projects focused on modeling, automation, analysis, and problem-solving.</p>
+            </div>
+            <div class="filters" id="filters">
+              <button class="filter-pill active" data-filter="All">All</button>
+              <button class="filter-pill" data-filter="Capital">Capital</button>
+              <button class="filter-pill" data-filter="Operations">Operations</button>
+              <button class="filter-pill" data-filter="Intelligence">Intelligence</button>
+              <button class="filter-pill" data-filter="Automation">Automation</button>
+            </div>
+            <div class="projects-grid" id="projectsGrid"></div>
+          </section>
+
+          <!-- ===== NOTES ===== -->
+          <section class="section" id="section-experience">
+            <div class="section-stamp"><span>Experience</span></div>
+            <div class="notes">
+              <h1 style="font-size: clamp(2.2rem, 3.6vw, 2.8rem); font-weight: 500; margin-bottom: 0.4rem; letter-spacing: -0.012em;">Experience</h1>
+              <p style="color: var(--muted-ink); font-style: italic; font-family: var(--font-display); margin-bottom: 1.5rem; font-size: 1.05rem;">
+                A chronological record of professional and leadership roles.
+              </p>
+              <div class="filters" id="expFilters" style="margin-bottom: 1.2rem;">
+                <button class="filter-pill active" data-filter="All">All</button>
+                <button class="filter-pill" data-filter="Professional">Professional</button>
+                <button class="filter-pill" data-filter="Leadership">Leadership</button>
+              </div>
+              <div id="experienceList"></div>
+            </div>
+          </section>
+
+          <!-- ===== CONTACT ===== -->
+          <section class="section" id="section-contact">
+            <div class="section-stamp"><span>Get in touch</span></div>
+            <div class="page-head" style="text-align: center;">
+              <h1>Let’s Connect</h1>
+            </div>
+
+            <div class="contact-grid">
+              <div class="contact-card">
+                <h2>Send a message</h2>
+                <form id="contactForm" action="https://formspree.io/f/xnjweznq" method="POST">
+                  <div class="form-field">
+                    <label for="cf-name">Name</label>
+                    <input class="form-input" type="text" id="cf-name" name="name" required />
+                  </div>
+                  <div class="form-field">
+                    <label for="cf-email">Email</label>
+                    <input class="form-input" type="email" id="cf-email" name="email" required />
+                  </div>
+                  <div class="form-field">
+                    <label for="cf-msg">Message</label>
+                    <textarea class="form-textarea" id="cf-msg" name="message" rows="4" required></textarea>
+                  </div>
+                  <input type="hidden" name="_subject" value="New message from your personal site" />
+                  <button class="form-btn" type="submit" id="cf-btn">Send message</button>
+                </form>
+              </div>
+            </div>
+          </section>
+        </div>
+      </main>
+    </div>
+
+    <div class="toast" id="toast">Message sent — talk soon.</div>
+
+    <script>
+      /* ============================================================
+         STARFIELD — canvas-based, parallax + twinkle + shooting stars
+         ============================================================ */
+      const canvas = document.getElementById("starfield");
+      const ctx = canvas.getContext("2d");
+      let dpr = Math.min(window.devicePixelRatio || 1, 2);
+      let stars = [];
+      let shootingStars = [];
+      // Day-mode state — sun, planets, dust motes
+      let motes = [];
+      let planets = [];
+      const sun = { x: 0, y: 0, baseR: 38 };
+      let mx = 0.5, my = 0.5;
+      let tmx = 0.5, tmy = 0.5;
+      const reduceMotion = window.matchMedia &&
+        window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+      function resizeCanvas() {
+        const w = window.innerWidth;
+        const h = Math.max(window.innerHeight, document.body.scrollHeight);
+        canvas.width = w * dpr;
+        canvas.height = h * dpr;
+        canvas.style.width = w + "px";
+        canvas.style.height = h + "px";
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        initStars(w, h);
+        initDay(w, h);
+      }
+
+      function initStars(w, h) {
+        stars = [];
+        const layers = [
+          { count: Math.floor((w * h) / 9000), depth: 0.1, sizeMul: 0.5 },
+          { count: Math.floor((w * h) / 12000), depth: 0.5, sizeMul: 0.9 },
+          { count: Math.floor((w * h) / 18000), depth: 1.2, sizeMul: 1.4 },
+        ];
+        layers.forEach((layer, li) => {
+          for (let i = 0; i < layer.count; i++) {
+            const hueRoll = Math.random();
+            stars.push({
+              layer: li,
+              depth: layer.depth,
+              x: Math.random() * w,
+              y: Math.random() * h,
+              r: (0.4 + Math.random() * 0.9) * layer.sizeMul,
+              baseAlpha: 0.25 + Math.random() * 0.55,
+              twinkleSpeed: 0.3 + Math.random() * 1.6,
+              twinklePhase: Math.random() * Math.PI * 2,
+              hue:
+                hueRoll < 0.78 ? "white" :
+                hueRoll < 0.92 ? "warm" : "cool",
+            });
+          }
+        });
+        // Polaris — anchor star, top-right area, warm and large
+        stars.push({
+          layer: 2,
+          depth: 1.4,
+          x: w - 220,
+          y: 120,
+          r: 2.6,
+          baseAlpha: 0.95,
+          twinkleSpeed: 0.25,
+          twinklePhase: 0,
+          hue: "warm",
+          isPolaris: true,
+        });
+      }
+
+      function getStarColor(s, alpha) {
+        if (s.hue === "warm") return `rgba(210, 170, 195, ${alpha})`;
+        if (s.hue === "cool") return `rgba(190, 210, 230, ${alpha})`;
+        return `rgba(255, 250, 240, ${alpha})`;
+      }
+
+      /* ------------------------------------------------------------
+         DAY MODE — sun, sunbeams, planets, dust motes
+         ------------------------------------------------------------ */
+      function initDay(w, h) {
+        // Sun position — top-left, mirroring Polaris's top-right placement.
+        // On narrow screens, scale in from the edge so it stays partly visible.
+        sun.x = Math.min(220, Math.max(150, w * 0.16));
+        sun.y = 170;
+
+        // Dust motes — daytime equivalent of stars, drifting up-right
+        motes = [];
+        const moteCount = Math.floor((w * h) / 22000);
+        for (let i = 0; i < moteCount; i++) {
+          motes.push({
+            x: Math.random() * w,
+            y: Math.random() * h,
+            vx: 0.04 + Math.random() * 0.14,
+            vy: -(0.025 + Math.random() * 0.08),
+            size: 0.5 + Math.random() * 1.0,
+            alpha: 0.18 + Math.random() * 0.32,
+            twinklePhase: Math.random() * Math.PI * 2,
+            twinkleSpeed: 0.6 + Math.random() * 1.2,
+          });
+        }
+
+        // Three planets on tilted (squashed) elliptical orbits.
+        // Inner orbits faster — vague nod to Kepler.
+        planets = [
+          { orbit: 130, angle: 0.3,         speed: 0.0014, r: 3.6, hue: "terracotta" },
+          { orbit: 240, angle: Math.PI*0.7, speed: 0.0009, r: 4.8, hue: "sage" },
+          { orbit: 380, angle: Math.PI*1.4, speed: 0.0006, r: 3.4, hue: "cream" },
+        ];
+      }
+
+      function planetColor(hue, alpha) {
+        if (hue === "terracotta") return `rgba(130, 53, 88, ${alpha})`;
+        if (hue === "sage")       return `rgba(110, 130, 100, ${alpha})`;
+        if (hue === "cream")      return `rgba(232, 220, 195, ${alpha})`;
+        return `rgba(184, 130, 158, ${alpha})`;
+      }
+
+      function drawFrame(t) {
+        const isDark = document.documentElement.classList.contains("dark");
+        const w = window.innerWidth;
+        const h = parseFloat(canvas.style.height);
+
+        ctx.clearRect(0, 0, w, h);
+
+        if (isDark) {
+          drawNight(t, w, h);
+        } else {
+          drawDay(t, w, h);
+        }
+      }
+
+      /* ------------------------------------------------------------
+         NIGHT — full starfield with Polaris + shooting stars
+         ------------------------------------------------------------ */
+      function drawNight(t, w, h) {
+        for (const s of stars) {
+          const tw = Math.sin(t * 0.001 * s.twinkleSpeed + s.twinklePhase);
+          const alpha = s.baseAlpha + tw * 0.3;
+          if (alpha <= 0.005) continue;
+
+          // Parallax — back layers barely move, front layers move more
+          const parallax = s.depth * 14;
+          const ox = (mx - 0.5) * parallax;
+          const oy = (my - 0.5) * parallax;
+
+          if (s.isPolaris) {
+            const grad = ctx.createRadialGradient(s.x + ox, s.y + oy, 0, s.x + ox, s.y + oy, 28);
+            grad.addColorStop(0, `rgba(200, 144, 176, ${alpha * 0.55})`);
+            grad.addColorStop(0.5, `rgba(200, 144, 176, ${alpha * 0.12})`);
+            grad.addColorStop(1, "transparent");
+            ctx.fillStyle = grad;
+            ctx.beginPath();
+            ctx.arc(s.x + ox, s.y + oy, 28, 0, Math.PI * 2);
+            ctx.fill();
+          }
+
+          ctx.fillStyle = getStarColor(s, alpha);
+          ctx.beginPath();
+          ctx.arc(s.x + ox, s.y + oy, s.r, 0, Math.PI * 2);
+          ctx.fill();
+        }
+
+        // Shooting stars
+        for (let i = shootingStars.length - 1; i >= 0; i--) {
+          const ss = shootingStars[i];
+          ss.x += ss.vx;
+          ss.y += ss.vy;
+          ss.life++;
+
+          const lifeRatio = ss.life / ss.maxLife;
+          const alpha = Math.sin(lifeRatio * Math.PI);
+
+          for (let j = 0; j < 14; j++) {
+            const tx = ss.x - ss.vx * j * 1.4;
+            const ty = ss.y - ss.vy * j * 1.4;
+            const tAlpha = alpha * (1 - j / 14) * 0.55;
+            if (tAlpha <= 0.01) continue;
+            ctx.fillStyle = `rgba(255, 250, 240, ${tAlpha})`;
+            ctx.beginPath();
+            ctx.arc(tx, ty, Math.max(0.2, 1.4 - j * 0.09), 0, Math.PI * 2);
+            ctx.fill();
+          }
+          ctx.fillStyle = `rgba(255, 250, 240, ${alpha})`;
+          ctx.beginPath();
+          ctx.arc(ss.x, ss.y, 1.6, 0, Math.PI * 2);
+          ctx.fill();
+
+          if (ss.life > ss.maxLife || ss.x > w + 60 || ss.y > h + 60) {
+            shootingStars.splice(i, 1);
+          }
+        }
+      }
+
+      /* ------------------------------------------------------------
+         DAY — solar system: sun + sunbeams + orbiting planets + motes
+         ------------------------------------------------------------ */
+      function drawDay(t, w, h) {
+        // 1. Warm atmospheric haze — golden-hour glow filling the sky
+        //    near the sun. Limit to upper portion so it doesn't wash
+        //    out the whole canvas.
+        const hazeRadius = 750;
+        const haze = ctx.createRadialGradient(sun.x, sun.y, 0, sun.x, sun.y, hazeRadius);
+        haze.addColorStop(0, "rgba(228, 192, 213, 0.18)");
+        haze.addColorStop(0.25, "rgba(184, 130, 158, 0.08)");
+        haze.addColorStop(0.6, "rgba(184, 130, 158, 0.025)");
+        haze.addColorStop(1, "transparent");
+        ctx.fillStyle = haze;
+        ctx.fillRect(0, 0, w, Math.min(h, hazeRadius * 1.3));
+
+        // 2. Sunbeams — slowly rotating thin radial streaks
+        const beamCount = 12;
+        const rotation = t * 0.00004;
+        ctx.save();
+        ctx.translate(sun.x, sun.y);
+        for (let i = 0; i < beamCount; i++) {
+          const angle = (i / beamCount) * Math.PI * 2 + rotation;
+          const length = 700 + Math.sin(t * 0.0007 + i * 0.5) * 120;
+          const breath = 0.045 + Math.sin(t * 0.0012 + i) * 0.025;
+
+          ctx.save();
+          ctx.rotate(angle);
+          const beam = ctx.createLinearGradient(40, 0, length, 0);
+          beam.addColorStop(0, `rgba(228, 192, 213, ${breath * 1.6})`);
+          beam.addColorStop(0.4, `rgba(184, 130, 158, ${breath * 0.7})`);
+          beam.addColorStop(1, "transparent");
+          ctx.fillStyle = beam;
+          ctx.beginPath();
+          ctx.moveTo(40, -3);
+          ctx.lineTo(length, -1);
+          ctx.lineTo(length, 1);
+          ctx.lineTo(40, 3);
+          ctx.closePath();
+          ctx.fill();
+          ctx.restore();
+        }
+        ctx.restore();
+
+        // 3. Faint orbital paths — like a printed astronomy chart
+        for (const p of planets) {
+          ctx.strokeStyle = "rgba(130, 53, 88, 0.08)";
+          ctx.lineWidth = 0.6;
+          ctx.beginPath();
+          ctx.ellipse(sun.x, sun.y, p.orbit, p.orbit * 0.42, 0, 0, Math.PI * 2);
+          ctx.stroke();
+        }
+
+        // 4. Dust motes — drift up-right with subtle parallax
+        const moteOx = (mx - 0.5) * 6;
+        const moteOy = (my - 0.5) * 6;
+        for (const m of motes) {
+          if (!reduceMotion) {
+            m.x += m.vx;
+            m.y += m.vy;
+            if (m.y < -20) m.y = h + 20;
+            if (m.x > w + 20) m.x = -20;
+          }
+          const tw = Math.sin(t * 0.001 * m.twinkleSpeed + m.twinklePhase);
+          const alpha = (m.alpha + tw * 0.18) * 0.7;
+          if (alpha <= 0.02) continue;
+          ctx.fillStyle = `rgba(184, 130, 158, ${alpha})`;
+          ctx.beginPath();
+          ctx.arc(m.x + moteOx, m.y + moteOy, m.size, 0, Math.PI * 2);
+          ctx.fill();
+        }
+
+        // 5. Planets — orbit, glow, body
+        for (const p of planets) {
+          if (!reduceMotion) p.angle += p.speed;
+          const px = sun.x + Math.cos(p.angle) * p.orbit;
+          const py = sun.y + Math.sin(p.angle) * p.orbit * 0.42;
+
+          // Soft glow halo
+          const pGlow = ctx.createRadialGradient(px, py, 0, px, py, p.r * 5);
+          pGlow.addColorStop(0, planetColor(p.hue, 0.4));
+          pGlow.addColorStop(0.4, planetColor(p.hue, 0.12));
+          pGlow.addColorStop(1, "transparent");
+          ctx.fillStyle = pGlow;
+          ctx.beginPath();
+          ctx.arc(px, py, p.r * 5, 0, Math.PI * 2);
+          ctx.fill();
+
+          // Body
+          ctx.fillStyle = planetColor(p.hue, 0.95);
+          ctx.beginPath();
+          ctx.arc(px, py, p.r, 0, Math.PI * 2);
+          ctx.fill();
+
+          // Tiny highlight for dimensionality
+          ctx.fillStyle = "rgba(255, 250, 235, 0.5)";
+          ctx.beginPath();
+          ctx.arc(px - p.r * 0.3, py - p.r * 0.3, p.r * 0.35, 0, Math.PI * 2);
+          ctx.fill();
+        }
+
+        // 6. The Sun — drawn last so it sits on top of beams + planets
+        const pulse = 1 + Math.sin(t * 0.0008) * 0.04;
+        const sunR = sun.baseR * pulse;
+
+        // Outer aureole
+        const aureole = ctx.createRadialGradient(sun.x, sun.y, 0, sun.x, sun.y, 220);
+        aureole.addColorStop(0, "rgba(255, 248, 232, 0.55)");
+        aureole.addColorStop(0.18, "rgba(240, 200, 215, 0.36)");
+        aureole.addColorStop(0.45, "rgba(184, 130, 158, 0.16)");
+        aureole.addColorStop(1, "transparent");
+        ctx.fillStyle = aureole;
+        ctx.beginPath();
+        ctx.arc(sun.x, sun.y, 220, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Solid core
+        const core = ctx.createRadialGradient(sun.x, sun.y, 0, sun.x, sun.y, sunR);
+        core.addColorStop(0, "rgba(255, 250, 232, 1)");
+        core.addColorStop(0.55, "rgba(252, 217, 168, 0.95)");
+        core.addColorStop(0.92, "rgba(220, 165, 158, 0.7)");
+        core.addColorStop(1, "rgba(184, 130, 158, 0)");
+        ctx.fillStyle = core;
+        ctx.beginPath();
+        ctx.arc(sun.x, sun.y, sunR, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      function spawnShootingStar() {
+        if (reduceMotion) return;
+        const w = window.innerWidth;
+        const h = window.innerHeight;
+        // Always travel down-and-right diagonally, but vary entry point
+        const fromTop = Math.random() < 0.5;
+        const speed = 4 + Math.random() * 3;
+        shootingStars.push({
+          x: fromTop ? Math.random() * w * 0.5 : -20,
+          y: fromTop ? -20 : Math.random() * h * 0.4,
+          vx: speed,
+          vy: speed * 0.6,
+          life: 0,
+          maxLife: 90,
+        });
+      }
+
+      function tick(t) {
+        // Smooth mouse follow
+        mx += (tmx - mx) * 0.06;
+        my += (tmy - my) * 0.06;
+        drawFrame(t);
+        requestAnimationFrame(tick);
+      }
+
+      window.addEventListener("mousemove", (e) => {
+        tmx = e.clientX / window.innerWidth;
+        tmy = e.clientY / window.innerHeight;
+      });
+
+      window.addEventListener("resize", () => {
+        clearTimeout(window.__resizeTimer);
+        window.__resizeTimer = setTimeout(resizeCanvas, 120);
+      });
+
+      resizeCanvas();
+      requestAnimationFrame(tick);
+
+      // Spawn shooting stars at uneven intervals (8–22 seconds)
+      function scheduleShootingStar() {
+        const delay = 8000 + Math.random() * 14000;
+        setTimeout(() => {
+          if (Math.random() < 0.7) spawnShootingStar();
+          scheduleShootingStar();
+        }, delay);
+      }
+      scheduleShootingStar();
+
+      /* ============================================================
+         THEME — defaults to dark (the night sky is the point)
+         ============================================================ */
+      const root = document.documentElement;
+      const themeIcon = document.getElementById("themeIcon");
+
+      function setTheme(theme) {
+        if (theme === "dark") {
+          root.classList.add("dark");
+          themeIcon.innerHTML = '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" fill="currentColor"></path>';
+        } else {
+          root.classList.remove("dark");
+          themeIcon.innerHTML = '<circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"></path>';
+        }
+      }
+
+      // Default to dark — the starry sky is the headline element
+      setTheme("dark");
+
+      function toggleTheme() {
+        setTheme(root.classList.contains("dark") ? "light" : "dark");
+      }
+      document.getElementById("themeToggle")?.addEventListener("click", toggleTheme);
+      document.getElementById("themeToggleMobile")?.addEventListener("click", toggleTheme);
+
+      /* ============================================================
+         CLOCK + DATE
+         ============================================================ */
+      const clockEl = document.getElementById("clock");
+      function tickClock() {
+        const d = new Date();
+        const h = String(d.getHours()).padStart(2, "0");
+        const m = String(d.getMinutes()).padStart(2, "0");
+        const s = String(d.getSeconds()).padStart(2, "0");
+        if (clockEl) clockEl.textContent = `${h}:${m}:${s}`;
+      }
+      tickClock();
+      setInterval(tickClock, 1000);
+
+      const dateStamp = document.getElementById("dateStamp");
+      if (dateStamp) {
+        const d = new Date();
+        dateStamp.textContent = d.toLocaleDateString("en-US", {
+          weekday: "long",
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+        });
+      }
+
+      /* ============================================================
+         NAVIGATION + CONSTELLATION SYNC
+         ============================================================ */
+      const navLinks = document.querySelectorAll(".nav-link");
+      const sections = document.querySelectorAll(".section");
+      const indicator = document.getElementById("navIndicator");
+      const desktopNav = document.getElementById("desktopNav");
+      const constStars = document.querySelectorAll(".constellation .cstar");
+
+      function moveIndicator(target) {
+        if (!indicator || !target || !desktopNav.contains(target)) return;
+        const navRect = desktopNav.getBoundingClientRect();
+        const targetRect = target.getBoundingClientRect();
+        indicator.style.transform = `translateY(${targetRect.top - navRect.top}px)`;
+        indicator.style.opacity = "1";
+      }
+
+      function activateSection(name) {
+        navLinks.forEach((l) => l.classList.toggle("active", l.dataset.section === name));
+        sections.forEach((s) => s.classList.toggle("active", s.id === `section-${name}`));
+        constStars.forEach((s) => s.classList.toggle("active", s.dataset.section === name));
+        const desktopActive = desktopNav.querySelector(`.nav-link.active`);
+        if (desktopActive) moveIndicator(desktopActive);
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      }
+
+      navLinks.forEach((link) => {
+        link.addEventListener("click", (e) => {
+          e.preventDefault();
+          activateSection(link.dataset.section);
+        });
+      });
+
+      // Constellation stars are also navigation — clicking a star jumps you there
+      constStars.forEach((star) => {
+        star.addEventListener("click", () => {
+          activateSection(star.dataset.section);
+        });
+      });
+
+      requestAnimationFrame(() => {
+        const initial = desktopNav.querySelector(".nav-link.active");
+        if (initial) moveIndicator(initial);
+      });
+
+      window.addEventListener("resize", () => {
+        const active = desktopNav.querySelector(".nav-link.active");
+        if (active) moveIndicator(active);
+      });
+
+      /* ============================================================
+         TYPED INTRO
+         ============================================================ */
+      const typedName = document.getElementById("typedName");
+      const fullName = "Alejandro";
+      let typedIdx = 0;
+      typedName.textContent = "";
+      function typeStep() {
+        if (typedIdx <= fullName.length) {
+          typedName.textContent = fullName.slice(0, typedIdx);
+          typedIdx++;
+          setTimeout(typeStep, 95);
+        }
+      }
+      setTimeout(typeStep, 700);
+
+      /* ============================================================
+         PROJECTS
+         ============================================================ */
+      const projects = [
+        {
+          name: "Supply Chain Infrastructure Investment Model",
+          color: "#3D8B7A",
+          desc: "A Python-based model that combines supply chain infrastructure forecasting, capital allocation, and investment valuation into an automated dashboard.",
+          stack: ["Python", "Linear Programming", "Monte Carlo Simulation", "Valuation"],
+          cats: ["Operations", "Capital"],
+        },
+        {
+          name: "S&P 500 Equity Analysis Tool",
+          color: "#3B5B92",
+          desc: "An automated equity research platform that scores S&P 500 companies and generates buy, sell, or hold recommendations using financial, valuation, risk, and market data.",
+          stack: ["Python", "Financial Data", "Valuation", "Stock Analysis"],
+          cats: ["Capital", "Intelligence"],
+        },
+      ];
+
+      function hexToRgb(hex) {
+        const n = parseInt(hex.replace("#", ""), 16);
+        return { r: (n >> 16) & 255, g: (n >> 8) & 255, b: n & 255 };
+      }
+      function tint(hex, mix = 0.92) {
+        const { r, g, b } = hexToRgb(hex);
+        const m = (c) => Math.round(255 * mix + c * (1 - mix));
+        return `rgb(${m(r)}, ${m(g)}, ${m(b)})`;
+      }
+
+      const grid = document.getElementById("projectsGrid");
+      function renderProjects(filter = "All") {
+        grid.innerHTML = "";
+        const filtered = filter === "All" ? projects : projects.filter((p) => p.cats.includes(filter));
+        filtered.forEach((p, i) => {
+          const card = document.createElement("div");
+          card.className = "project-card";
+          card.style.setProperty("--card-bg", tint(p.color, 0.92));
+          card.style.setProperty("--card-border", tint(p.color, 0.78));
+          card.style.setProperty("--card-color", p.color);
+          card.style.animationDelay = `${i * 50}ms`;
+          card.innerHTML = `
+            <span class="project-dot"></span>
+            <h3 class="project-name">${p.name}</h3>
+            <div class="project-cats">${p.cats.map((c) => `<span class="project-cat">${c}</span>`).join("")}</div>
+            <p class="project-desc">${p.desc}</p>
+            <div class="stack">${p.stack.map((s) => `<span class="stack-item">${s}</span>`).join("")}</div>
+          `;
+          grid.appendChild(card);
+        });
+      }
+      renderProjects();
+
+      document.getElementById("filters").addEventListener("click", (e) => {
+        const btn = e.target.closest(".filter-pill");
+        if (!btn) return;
+        document.querySelectorAll(".filter-pill").forEach((p) => p.classList.remove("active"));
+        btn.classList.add("active");
+        renderProjects(btn.dataset.filter);
+      });
+
+      /* ============================================================
+         EXPERIENCE
+         Add entries to the array below. Each entry: title, role, location,
+         start (YYYY-MM), end (YYYY-MM or "Present"), kind, bullets[].
+         Items are auto-grouped by start year, newest year first.
+         ============================================================ */
+      const experience = [
+        {
+          title: "Sun Devil Fintech",
+          role: "Co-Founder & Vice President (Finance & Strategy)",
+          location: "Tempe, AZ",
+          kind: "Leadership",
+          start: "2024-02",
+          end: "Present",
+          bullets: [
+            "Established and managed the club's full financial operation using Excel, overseeing a $2,000 merchandise budget and per-event costs by tracking purchases and controlling spending to keep every event within budget.",
+            "Planned and coordinated club events end to end, handling logistics, vendor communication, and cost control to ensure execution.",
+            "Reviewed member work and provided feedback to help new board members meet club procedures within the organization.",
+          ],
+        },
+        {
+          title: "Aramark",
+          role: "Catering Services Supervisor",
+          location: "Phoenix Convention Center · Tempe, AZ",
+          kind: "Professional",
+          start: "2025-08",
+          end: "2025-12",
+          bullets: [
+            "Supervised beverage inventory and managed stock levels across multiple event spaces, coordinating with staff to identify and fulfill supply shortages in real time during live ASU events.",
+            "Communicated across teams to ensure smooth operations and consistent service delivery throughout high-pressure event days at the Phoenix Convention Center.",
+          ],
+        },
+        {
+          title: "Alpha Kappa Lambda",
+          role: "Chair of Social Media",
+          location: "Tempe, AZ",
+          kind: "Leadership",
+          start: "2025-05",
+          end: "2025-09",
+          bullets: [
+            "Redesigned Instagram content strategy and page structure, leading a logo and visual refresh that improved brand consistency across the chapter.",
+            "Used Instagram analytics to test posts, growing reach to 115K total views over the term and averaging 9K views per post.",
+          ],
+        },
+        {
+          title: "Flagstar Bank",
+          role: "Branch Banking Client Consultant I",
+          location: "Scottsdale, AZ",
+          kind: "Professional",
+          start: "2025-05",
+          end: "2025-07",
+          bullets: [
+            "Managed a $7,500 daily cashbox and processed client transactions up to $3,000, maintaining full compliance with federal regulations and reconciling cash accurately at end of day.",
+            "Contacted 20 new existing clients weekly using Fiserv and Salesforce to assess financial needs, recommend new banking products, and track follow-ups to support branch goals.",
+          ],
+        },
+        {
+          title: "Den of Innovation Thinktank (DoIT)",
+          role: "Vice President",
+          location: "Tempe, AZ",
+          kind: "Leadership",
+          start: "2024-11",
+          end: "2025-07",
+          bullets: [
+            "Administered a $2,000 semester budget covering all club activities, tracking cash flows and coordinating event logistics while communicating with teammates to keep operations organized.",
+            "Designed a new brand logo and managed the club's social media presence alongside financial responsibilities, contributing to both the identity and operations of the organization.",
+          ],
+        },
+        {
+          title: "Sun Devil Fitness and Wellness",
+          role: "Sports Program Supervisor",
+          location: "Tempe, AZ",
+          kind: "Professional",
+          start: "2024-08",
+          end: "2024-12",
+          bullets: [
+            "Enforced safety protocols and used CPR certification to reduce incidents through proactive safety measures across active fitness programming.",
+          ],
+        },
+        {
+          title: "W.P. Carey School of Business",
+          role: "Summer Director",
+          location: "Tempe, AZ",
+          kind: "Professional",
+          start: "2024-05",
+          end: "2024-08",
+          bullets: [
+            "Built a complete budget tracking system from scratch in Excel for a brand-new position, manually researching vendor costs and calculating spending estimates across food and student perks to manage a $20,000 program budget with no prior template.",
+            "Generated daily financial reports tracking expenses and funding allocations to keep the team informed on budget performance.",
+            "Led outreach through email, phone, and social media to recruit students into the program — and interviewed and mentored student leaders who each supervised groups of 10 incoming students.",
+          ],
+        },
+        {
+          title: "Explorers",
+          role: "Finance Associate",
+          location: "Tempe, AZ",
+          kind: "Leadership",
+          start: "2023-02",
+          end: "2023-05",
+          bullets: [
+            "Allocated financial resources across club priorities and researched alternative budgets to support upcoming events.",
+            "Conducted online research to provide insights for E-board decision-making, helping the leadership team weigh trade-offs before committing funds.",
+            "Optimized expenditures to make judicious, high-impact use of the club's financial resources.",
+          ],
+        },
+        {
+          title: "South Park Community Center",
+          role: "Youth Program Coordinator",
+          location: "Seattle, WA",
+          kind: "Leadership",
+          start: "2020-05",
+          end: "2020-06",
+          bullets: [
+            "Designed and ran initiatives that built connections among children through dynamic teamwork activities, creating a positive environment where each child felt supported.",
+            "Developed a tailored curriculum emphasizing teamwork, communication, and problem-solving — and built consistent communication channels with parents to keep them informed on program activities and their child's progress.",
+          ],
+        },
+      ];
+
+      const experienceList = document.getElementById("experienceList");
+      function renderExperience(filter = "All") {
+        if (!experienceList) return;
+        experienceList.innerHTML = "";
+        if (experience.length === 0) return;
+
+        const filtered = filter === "All"
+          ? experience
+          : experience.filter((e) => e.kind === filter);
+
+        if (filtered.length === 0) {
+          experienceList.innerHTML = `<p style="color: var(--soft-ink); font-style: italic; text-align: center; padding: 2rem 0;">No ${filter.toLowerCase()} entries yet.</p>`;
+          return;
+        }
+
+        const fmt = (s) => {
+          if (s === "Present") return "Present";
+          // Parse "YYYY-MM" by appending day 15 so timezone shifts can't roll
+          // the date into the previous month.
+          const [y, m] = s.split("-");
+          const d = new Date(parseInt(y, 10), parseInt(m, 10) - 1, 15);
+          return d.toLocaleDateString("en-US", { month: "short", year: "numeric" });
+        };
+
+        const renderItem = (e) => {
+          const item = document.createElement("div");
+          item.className = "exp-item";
+          const bulletsHTML = (e.bullets || [])
+            .map((b) => `<li>${b}</li>`)
+            .join("");
+          item.innerHTML = `
+            <div class='exp-head'>
+              <span class='exp-title'>${e.title}</span>
+              ${e.kind ? `<span class='exp-kind'>${e.kind}</span>` : ""}
+              <span class='exp-date'>${fmt(e.start)} → ${fmt(e.end)}</span>
+            </div>
+            <div class='exp-subhead'>
+              <span class='exp-role'>${e.role}</span>
+              ${e.location ? `<span class='exp-loc'>${e.location}</span>` : ""}
+            </div>
+            <ul class='exp-bullets'>${bulletsHTML}</ul>
+          `;
+          experienceList.appendChild(item);
+        };
+
+        // 1. Pin ongoing roles ("Present") to the very top under a "Current" header
+        const ongoing = filtered.filter((e) => e.end === "Present");
+        const past = filtered.filter((e) => e.end !== "Present");
+
+        if (ongoing.length > 0) {
+          const currentHeader = document.createElement("div");
+          currentHeader.className = "year-header";
+          currentHeader.innerHTML = `<span class='year-line'></span><span class='year-text'>Current</span><span class='year-line'></span>`;
+          experienceList.appendChild(currentHeader);
+          ongoing
+            .sort((a, b) => +new Date(b.start) - +new Date(a.start))
+            .forEach(renderItem);
+        }
+
+        // 2. Then the rest, grouped by start year (newest first)
+        const byYear = {};
+        past.forEach((e) => {
+          const [yy, mm] = e.start.split("-");
+          const y = yy;
+          (byYear[y] ||= []).push(e);
+        });
+        const years = Object.keys(byYear).sort((a, b) => b - a);
+        years.forEach((y) => {
+          const header = document.createElement("div");
+          header.className = "year-header";
+          header.innerHTML = `<span class='year-line'></span><span class='year-text'>${y}</span><span class='year-line'></span>`;
+          experienceList.appendChild(header);
+          byYear[y]
+            .sort((a, b) => +new Date(b.start) - +new Date(a.start))
+            .forEach(renderItem);
+        });
+      }
+      renderExperience();
+
+      // Wire up the experience filter pills
+      const expFilters = document.getElementById("expFilters");
+      if (expFilters) {
+        expFilters.addEventListener("click", (e) => {
+          const btn = e.target.closest(".filter-pill");
+          if (!btn) return;
+          expFilters.querySelectorAll(".filter-pill").forEach((p) => p.classList.remove("active"));
+          btn.classList.add("active");
+          renderExperience(btn.dataset.filter);
+        });
+      }
+
+      /* ============================================================
+         CONTACT FORM — submits to Formspree without leaving the page
+         ============================================================ */
+      const form = document.getElementById("contactForm");
+      const toast = document.getElementById("toast");
+      const cfBtn = document.getElementById("cf-btn");
+
+      function showToast(message, isError = false) {
+        toast.textContent = message;
+        toast.style.borderColor = isError
+          ? "rgba(200, 90, 90, 0.45)"
+          : "rgba(var(--accent-rgb), 0.4)";
+        toast.classList.add("show");
+        setTimeout(() => toast.classList.remove("show"), 3200);
+      }
+
+      form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        cfBtn.disabled = true;
+        cfBtn.textContent = "Sending…";
+
+        try {
+          const response = await fetch(form.action, {
+            method: "POST",
+            body: new FormData(form),
+            headers: { Accept: "application/json" },
+          });
+
+          if (response.ok) {
+            cfBtn.textContent = "Sent ✓";
+            showToast("Message sent — talk soon.");
+            form.reset();
+            setTimeout(() => {
+              cfBtn.disabled = false;
+              cfBtn.textContent = "Send message";
+            }, 2600);
+          } else {
+            const data = await response.json().catch(() => ({}));
+            const msg =
+              data.errors && data.errors.length
+                ? data.errors.map((err) => err.message).join(", ")
+                : "Something went wrong — please try again.";
+            showToast(msg, true);
+            cfBtn.disabled = false;
+            cfBtn.textContent = "Send message";
+          }
+        } catch (err) {
+          showToast("Network error — please try again.", true);
+          cfBtn.disabled = false;
+          cfBtn.textContent = "Send message";
+        }
+      });
+    </script>
+  </body>
+</html>
